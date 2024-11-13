@@ -3,6 +3,7 @@ import 'package:mobile_project_1/classes/music.dart';
 import 'package:mobile_project_1/components/big_song_btn.dart';
 import 'package:mobile_project_1/components/play_bar.dart';
 import 'package:mobile_project_1/components/song_bar.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,13 +14,40 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  int songIndex = 0;
+  final player = AudioPlayer();
+  String currentMusic = "";
+
+  Future<void> playSound(String? currunt) async{
+    if(currunt != null){
+        currentMusic = currunt;
+      }
+    await player.play(AssetSource(currentMusic));
+  }
+  Future<void> pauseSound() async{
+    await player.pause();
+  }
+  Future<void> stopSound() async{
+    await player.stop();
+  }
+
+  void onPlayState(bool b){
+    setState(() {
+      onPlay = b;
+    });
+  }
+    int songIndex = 0;
+    bool onPlay = true;
 
    void pickSong(int index){
     setState(() {
       songIndex = index;
       showPlayBar = true;
       playingMusic = musicList[songIndex];
+      stopSound();
+      currentMusic = playingMusic.audio;
+      if(onPlay){
+        playSound(currentMusic);
+      }
     });
   }
 
@@ -30,6 +58,10 @@ class _HomeState extends State<Home> {
         playingMusic = musicList[songIndex];
       }
     });
+    stopSound();
+    if(onPlay){
+      playSound(playingMusic.audio);
+    }
   }
   void moveBackward(){
     setState(() {
@@ -38,15 +70,19 @@ class _HomeState extends State<Home> {
         playingMusic = musicList[songIndex];
       }
     });
+    stopSound();
+    if(onPlay){
+      playSound(playingMusic.audio);
+    }
   }
   bool showPlayBar = false;
-  String samir = "";
   List<Music> musicList= 
   [
-  Music(title: "Dim Lights",artist: "The weeknd",imageUrl: "dimLights",playsCount:1000000,),
-  Music(title: "Min Samir ?",artist: "Tamer Hosny",imageUrl: "tamer",playsCount:3200,),
-  Music(title: "My Pickels",artist: "Wael Mokhalallate",imageUrl: "pickels",playsCount:243,),
-  Music(title: "Maestro",artist: "Magnus Carlsen",imageUrl: "magnus",playsCount:300000,),
+  Music(title: "Dim Lights",artist: "The weeknd",imageUrl: "dimLights",playsCount:1200000,audio: "dimLights.mp3"),
+  Music(title: "Min Samir ?",artist: "Tamer Hosny",imageUrl: "tamer",playsCount:3200, audio: "minSamir.mp3"),
+  Music(title: "My Pickels",artist: "Wael Mokhalallate",imageUrl: "pickels",playsCount:243, audio: "pickels.mp3"),
+  Music(title: "Maestro",artist: "Magnus Carlsen",imageUrl: "magnus",playsCount:300000, audio: "maestro.mp3"),
+  Music(title: "Meow",artist: "Cat",imageUrl:"meow",playsCount:22000, audio: "meow.mp3"),
 ];
 late Music playingMusic;
  @override
@@ -74,7 +110,7 @@ late Music playingMusic;
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[900],
                 ),
-              )
+              ),
           ],
         ),
         centerTitle: true,
@@ -86,9 +122,9 @@ late Music playingMusic;
           child: Column(
             children: [
               const SizedBox(height: 10),
-               Text(
-                "What's recomended for you ? $samir",
-                style: const TextStyle(
+               const Text(
+                "What's recomended for you ?",
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -154,6 +190,24 @@ late Music playingMusic;
                   );
                 }
                 ),
+                const SizedBox(height: 50),
+                const Text(
+                  "Your Playlists",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 30,),
+                const Text(
+                  "Coming Soon",
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
                 const SizedBox(height: 70),
             ],
           ),
@@ -163,6 +217,9 @@ late Music playingMusic;
       music: playingMusic,
       moveForward: moveForward,
       moveBackward: moveBackward,
+      play:playSound,
+      pause: pauseSound,
+      onPlay: onPlayState,
       ) : null,
     );
   }

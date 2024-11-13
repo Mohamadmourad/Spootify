@@ -3,22 +3,29 @@ import 'package:mobile_project_1/classes/music.dart';
 
 class PlayBar extends StatefulWidget {
   final Music music;
+  final Function play;
+  final Function pause;
   final Function moveForward;
   final Function moveBackward;
-  const PlayBar({super.key, required this.music, required this.moveForward, required this.moveBackward});
+   final Function onPlay;
+   const PlayBar({super.key, required this.music, required this.moveForward, required this.moveBackward, required this.play, required this.pause, required this.onPlay});
 
   @override
   State<PlayBar> createState() => _PlayBarState();
 }
 
 class _PlayBarState extends State<PlayBar> {
-  IconData playButton = Icons.play_arrow;
+  IconData playButton = Icons.pause;
   void playPause(){
     setState(() {
       if(playButton == Icons.play_arrow){
         playButton = Icons.pause;
+        widget.play(widget.music.audio);
+        widget.onPlay(true);
       }else{
         playButton = Icons.play_arrow;
+        widget.pause();
+        widget.onPlay(false);
       }
     });
   }
